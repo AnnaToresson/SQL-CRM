@@ -16,10 +16,13 @@ namespace SQL_CRM
                 Console.WriteLine("2. Update a customer");
                 Console.WriteLine("3. Delete a customer");
                 Console.WriteLine("4. Get all customers");
-                Console.WriteLine("5. Quit");
+                Console.WriteLine("5. Clear screen");
+                Console.WriteLine("6. Quit");
+
                 Console.WriteLine("___________________________________");
 
                 var input = Console.ReadLine();
+                
                 if (input == "1")
                     AddCustomer();
                 else if (input == "2")
@@ -35,7 +38,12 @@ namespace SQL_CRM
                     }
 
                 }
-                else if (input == "5")
+                else if (input=="5")
+                {
+                    Console.Clear();
+
+                }
+                else if (input == "6")
                     break;
 
 
