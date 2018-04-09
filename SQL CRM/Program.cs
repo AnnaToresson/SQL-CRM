@@ -9,35 +9,49 @@ namespace SQL_CRM
         private static string conString = @"Server = (localdb)\mssqllocaldb; DataBase = CustomerCRM; Trusted_Connection = True";
         private static void Main(string[] args)
         {
-            Console.WriteLine("Categories".ToUpper());
-            Console.WriteLine("1. Create new customer");
-            Console.WriteLine("2. Update a customer");
-            Console.WriteLine("3. Delete a customer");
-            Console.WriteLine("4. Get all customers");
-            Console.WriteLine("5. Quit");
-            Console.WriteLine("___________________________________");
+            while (true)
+            {
+                Console.WriteLine("Categories".ToUpper());
+                Console.WriteLine("1. Create new customer");
+                Console.WriteLine("2. Update a customer");
+                Console.WriteLine("3. Delete a customer");
+                Console.WriteLine("4. Get all customers");
+                Console.WriteLine("5. Quit");
+                Console.WriteLine("___________________________________");
 
-            var input = Console.ReadLine();
-            if (input=="1")
-                AddCustomer();
-            else if (input=="2")
-                UpdateCustomerInfo();
-            else if (input=="3")
-                DeleteCustomer();
-            else if(input=="4")
-                GetInfoOnCustomers();
-            else
+                var input = Console.ReadLine();
+                if (input == "1")
+                    AddCustomer();
+                else if (input == "2")
+                    UpdateCustomerInfo();
+                else if (input == "3")
+                    DeleteCustomer();
+                else if (input == "4")
+                {
+                    var list = GetInfoOnCustomers();
+                    foreach (var item in list)
+                    {
+                        PrintCustomer(item);
+                    }
+
+                }
+                else if (input == "5")
+                    break;
+
+
                 Console.WriteLine();
+                Console.WriteLine("___________________________________");
 
-            Console.WriteLine();
-            Console.WriteLine("___________________________________");
+            }
+
 
 
         }
 
-        public static void GetInfoOnCustomers()
+        public static List<Customer> GetInfoOnCustomers()
         {
-            var sql = @"SELECT [FirstName],[LastName] FROM CustomerInfo";
+            var list = new List<Customer>();
+            var sql = @"SELECT * FROM CustomerInfo";
             using (SqlConnection connection = new SqlConnection(conString))
             using (SqlCommand command = new SqlCommand(sql, connection))
             {
@@ -48,22 +62,25 @@ namespace SQL_CRM
 
                 while (reader.Read())
                 {
-                    //var id = reader.GetString(2);
-                    var firstname = reader.GetString(0);
-                    var lastname = reader.GetString(1);
-                   
-                    
-                   
-                    System.Console.WriteLine($"{firstname} {lastname}");
+
+                    var firstname = reader.GetString(1);
+                    var lastname = reader.GetString(2);
+                    var email = reader.GetString(3);
+                    var phoneNumber = reader.GetString(4);
+                    var id = reader.GetInt32(0);
+                    list.Add(new Customer(firstname, lastname, email, phoneNumber, id));
+
+                    //System.Console.WriteLine($"{firstname} {lastname}");
                 }
 
             }
-            Console.WriteLine();
+
+            return list;
         }
 
         public static void AddCustomer()
         {
-            Console.Write("Enter customers info, seperated by ' ':");
+            Console.Write("Enter a new customers info, seperated by ' ':");
             try
             {
                 var input = Console.ReadLine();
@@ -93,8 +110,8 @@ namespace SQL_CRM
 
                 Console.WriteLine("An error occurred: {0}", ex);
             }
-            
-           
+
+
 
         }
 
@@ -106,20 +123,19 @@ namespace SQL_CRM
         public static void UpdateCustomerInfo()
         {
 
-            
+
 
             try
             {
-                Console.WriteLine("Vem vill du ändra på?");
+                Console.WriteLine("Enter a customer to update");
 
                 string input = Console.ReadLine();
                 var list = getCustomersFromFirstName(input);
                 for (int i = 0; i < list.Count; i++)
                 {
                     Console.WriteLine($"{i + 1} {list[i].FirstName} {list[i].LastName}");
-
-
                 }
+
                 input = Console.ReadLine();
                 int index = int.Parse(input) - 1;
                 PrintCustomer(list[index]);
@@ -132,7 +148,6 @@ namespace SQL_CRM
                 string lastName = input.Split(' ')[1];
                 string email = input.Split(' ')[2];
                 string phoneNumber = input.Split(' ')[3];
-
 
 
                 string sql = $"UPDATE CustomerInfo SET FirstName=@firstName, LastName=@lastName, Email=@email, PhoneNumber=@phonenumber WHERE Id=@id";
@@ -155,10 +170,10 @@ namespace SQL_CRM
             {
 
                 Console.WriteLine("An error occurred: {0}", ex);
-               
+
             }
-           
-            
+
+
         }
 
         private static List<Customer> getCustomersFromFirstName(string input)
@@ -171,7 +186,7 @@ namespace SQL_CRM
 
                 connection.Open();
                 command.Parameters.Add(new SqlParameter("input", input));
-                var reader=command.ExecuteReader();
+                var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
                     var firstName = reader.GetString(1);
@@ -180,22 +195,32 @@ namespace SQL_CRM
                     var phoneNumber = reader.GetString(4);
                     var id = reader.GetInt32(0);
 
-                    list.Add(new Customer(firstName,lastName, email, phoneNumber, id));
+                    list.Add(new Customer(firstName, lastName, email, phoneNumber, id));
                 }
 
             }
 
             return list;
-           
+
         }
 
         public static void DeleteCustomer()
         {
-            Console.WriteLine("Enter the id of the customer to delete");
+            Console.WriteLine("Enter a customer to delete");
 
-             var input = Console.ReadLine();
+            string input = Console.ReadLine();
+            var list = getCustomersFromFirstName(input);
+            for (int i = 0; i < list.Count; i++)
+            {
+                Console.WriteLine($"{i + 1} {list[i].FirstName} {list[i].LastName}");
 
-            string id = input.Split(' ')[0];
+
+            }
+            input = Console.ReadLine();
+            int index = int.Parse(input) - 1;
+            PrintCustomer(list[index]);
+
+
             //string lastName = input.Split(' ')[1];
             //string email = input.Split(' ')[2];
             //string phoneNumber = input.Split(' ')[3];
@@ -211,9 +236,9 @@ namespace SQL_CRM
                     {
                         connection.Open();
                         //Parameters
-                        command.Parameters.Add(new SqlParameter("id", id));
+                        command.Parameters.Add(new SqlParameter("id", list[index].Id));
                         command.ExecuteNonQuery();
-                        
+
                     }
                 }
             }
@@ -222,7 +247,7 @@ namespace SQL_CRM
                 Console.WriteLine("An error occurred: {0}", ex);
             }
 
-            Console.WriteLine($"The customer with id = {id} is deleted");
+            Console.WriteLine($"The customer is deleted");
         }
     }
 
