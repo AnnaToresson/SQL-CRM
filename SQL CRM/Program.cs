@@ -33,7 +33,6 @@ namespace SQL_CRM
                     {
                         PrintCustomer(item);
                     }
-
                 }
                 else if (input == "5")
                 {
@@ -74,22 +73,20 @@ namespace SQL_CRM
 
                 SqlDataReader reader = command.ExecuteReader();
                 Console.WriteLine("Existing customers:".ToUpper());
+                Console.WriteLine($"{"Customers name:",-20}{"Emai:",-20}{"Phone:"}");
+
 
                 while (reader.Read())
                 {
 
-                    var firstname = reader.GetString(1);
-                    var lastname = reader.GetString(2);
+                    var firstName = reader.GetString(1);
+                    var lastName = reader.GetString(2);
                     var email = reader.GetString(3);
                     var phoneNumber = reader.GetString(4);
                     var id = reader.GetInt32(0);
-                    list.Add(new Customer(firstname, lastname, email, phoneNumber, id));
-
-                    //System.Console.WriteLine($"{firstname} {lastname}");
+                    list.Add(new Customer(firstName, lastName, email, phoneNumber, id));
                 }
-
             }
-
             return list;
         }
 
@@ -130,7 +127,8 @@ namespace SQL_CRM
 
         public static void PrintCustomer(Customer customer)
         {
-            Console.WriteLine($"{customer.FirstName} {customer.LastName}, {customer.Email}, {customer.PhoneNumber}");
+
+            Console.WriteLine($"{$"{customer.FirstName} {customer.LastName}",-20}{customer.Email,-20}{customer.PhoneNumber}");
         }
 
         public static void UpdateCustomerInfo()
@@ -151,7 +149,7 @@ namespace SQL_CRM
                 int index = int.Parse(input) - 1;
                 PrintCustomer(list[index]);
 
-                Console.Write("Enter customers firstname, lastname, email, phonenumber and Id-number, seperated by ' ':");
+                Console.Write("Enter customers info and id, seperated by ' ':");
                 input = Console.ReadLine();
 
                 string firstName = input.Split(' ')[0];
@@ -181,9 +179,7 @@ namespace SQL_CRM
             {
 
                 Console.WriteLine("An error occurred: {0}", ex);
-
             }
-
 
         }
 
@@ -195,7 +191,6 @@ namespace SQL_CRM
             using (SqlConnection connection = new SqlConnection(conString))
             using (SqlCommand command = new SqlCommand(sql, connection))
             {
-
                 connection.Open();
                 command.Parameters.Add(new SqlParameter("input", input));
                 var reader = command.ExecuteReader();
@@ -210,9 +205,7 @@ namespace SQL_CRM
                     list.Add(new Customer(firstName, lastName, email, phoneNumber, id));
                 }
             }
-
             return list;
-
         }
 
         public static void DeleteCustomer()
