@@ -44,13 +44,14 @@ namespace SQL_CRM
 
 
                 Console.WriteLine();
-                Console.WriteLine("___________________________________");
+                DisplaySeparator();
             }
 
         }
 
         private static void DisplayCategories()
         {
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Categories".ToUpper());
             Console.WriteLine("1. Create new customer");
             Console.WriteLine("2. Update a customer");
@@ -58,8 +59,15 @@ namespace SQL_CRM
             Console.WriteLine("4. Get all customers");
             Console.WriteLine("5. Clear screen");
             Console.WriteLine("6. Quit");
+            Console.ResetColor();
 
-            Console.WriteLine("___________________________________");
+            DisplaySeparator();
+            
+        }
+        public static void DisplaySeparator()
+        {
+            Console.WriteLine("________________________________________________");
+
         }
 
         public static List<Customer> GetInfoOnCustomers()
@@ -72,8 +80,9 @@ namespace SQL_CRM
                 connection.Open();
 
                 SqlDataReader reader = command.ExecuteReader();
-                Console.WriteLine("Existing customers:".ToUpper());
-                Console.WriteLine($"{"Customers name:",-20}{"Emai:",-20}{"Phone:"}");
+                //Console.WriteLine("Existing customers:".ToUpper());
+                Console.WriteLine($"{"Customers name:",-20}{"Email:",-20}{"Phone:"}".ToUpper());
+               
 
 
                 while (reader.Read())
